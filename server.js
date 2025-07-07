@@ -50,7 +50,7 @@ app.use('/api/auth', authRoutes);
 // Authentication middleware
 function authenticate(req, res, next) {
     const token = req.body.token || req.headers.authorization?.split(' ')[1];
-    
+
     if (!token) {
         return res.status(401).json({ message: 'Authentication required' });
     }
@@ -110,6 +110,31 @@ app.post('/api/excel', authenticate, upload.single('file'), async (req, res) => 
     }
 });
 
+// ✅ Route to download file by ID (used in "My Files")
+app.get('/api/files/:id', authenticate, async (req, res) => {
+    try {
+        const file = await File.findById(req.params.id);
+        if (!file) return res.status(404).json({ message: 'File not found' });
+
+        if (file.userId.toString() !== req.userId) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        if (!fs.existsSync(file.path)) {
+            return res.status(404).json({ message: 'File not found on server' });
+        }
+
+        res.download(file.path, file.processedName, (err) => {
+            if (err) {
+                console.error('Download error:', err);
+            }
+        });
+    } catch (err) {
+        console.error('Download route error:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // Helper functions
 async function sendFileResponse(res, result, originalName) {
     const fileRecord = new File({
@@ -124,16 +149,21 @@ async function sendFileResponse(res, result, originalName) {
     await fileRecord.save();
 
     res.download(result.filepath, result.filename, (err) => {
-        if (err) console.error('Download error:', err);
-        fs.unlinkSync(result.filepath);
+        if (err) {
+            console.error('Download error:', err);
+        } else {
+            fs.unlink(result.filepath, (unlinkErr) => {
+                if (unlinkErr) console.error('Error deleting file:', unlinkErr);
+            });
+        }
     });
 }
 
 function handleError(res, err, operation) {
     console.error(`${operation} error:`, err);
-    res.status(500).json({ 
+    res.status(500).json({
         message: `Failed to ${operation} file`,
-        error: err.message 
+        error: err.message
     });
 }
 
@@ -142,11 +172,11 @@ app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
 
-// Clean up old files
+// Clean up old files every hour
 setInterval(() => {
     const now = Date.now();
     const oneHour = 60 * 60 * 1000;
-    
+
     ['uploads', 'output'].forEach(dir => {
         const dirPath = path.join(__dirname, dir);
         if (fs.existsSync(dirPath)) {
@@ -154,7 +184,9 @@ setInterval(() => {
                 const filePath = path.join(dirPath, file);
                 const stat = fs.statSync(filePath);
                 if (now - stat.mtimeMs > oneHour) {
-                    fs.unlinkSync(filePath);
+                    fs.unlink(filePath, err => {
+                        if (err) console.error('Cleanup error:', err);
+                    });
                 }
             });
         }
