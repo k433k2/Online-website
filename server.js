@@ -90,7 +90,89 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+// Add these routes to your server.js
 
+// Protected file routes
+app.post('/api/merge', authenticate, upload.array('files', 10), processFiles('merge'));
+app.post('/api/split', authenticate, upload.single('file'), processFiles('split'));
+app.post('/api/compress', authenticate, upload.single('file'), processFiles('compress'));
+app.post('/api/word', authenticate, upload.single('file'), processFiles('word'));
+app.post('/api/excel', authenticate, upload.single('file'), processFiles('excel'));
+
+// Authentication middleware
+function authenticate(req, res, next) {
+    const token = req.body.token || req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, config.jwtSecret);
+        req.userId = decoded.id;
+        next();
+    } catch (err) {
+        res.status(401).json({ message: 'Invalid token' });
+    }
+}
+
+// File processing factory
+function processFiles(toolType) {
+    return async (req, res) => {
+        try {
+            let result;
+            
+            switch(toolType) {
+                case 'merge':
+                    result = await mergePDFs(req.files);
+                    break;
+                case 'split':
+                    result = await splitPDF(req.file);
+                    break;
+                case 'compress':
+                    result = await compressPDF(req.file);
+                    break;
+                case 'word':
+                    result = await convertToWord(req.file);
+                    break;
+                case 'excel':
+                    result = await convertToExcel(req.file);
+                    break;
+                default:
+                    throw new Error('Invalid tool type');
+            }
+
+            // Save file info to database if user is authenticated
+            if (req.userId) {
+                const fileRecord = new File({
+                    userId: req.userId,
+                    toolType,
+                    originalName: req.file?.originalname || 'merged.pdf',
+                    processedName: result.filename,
+                    path: result.filepath,
+                    size: result.size,
+                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+                });
+                await fileRecord.save();
+            }
+
+            // Send the file for download
+            res.download(result.filepath, result.filename, (err) => {
+                if (err) {
+                    console.error('Download error:', err);
+                }
+                // Clean up file after sending
+                fs.unlinkSync(result.filepath);
+            });
+        } catch (err) {
+            console.error(`${toolType} error:`, err);
+            res.status(500).json({ 
+                message: `Failed to ${toolType} PDF`,
+                error: err.message 
+            });
+        }
+    };
+}
 // Validate token
 router.get('/validate', async (req, res) => {
     try {
