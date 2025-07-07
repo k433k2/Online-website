@@ -109,7 +109,45 @@ app.post('/api/excel', authenticate, upload.single('file'), async (req, res) => 
         handleError(res, err, 'excel');
     }
 });
+// Add to server.js after other routes
 
+// Get user's files
+app.get('/api/files', authenticate, async (req, res) => {
+    try {
+        const files = await File.find({ userId: req.userId })
+            .sort({ createdAt: -1 })
+            .limit(50);
+        res.json(files);
+    } catch (err) {
+        console.error('Error fetching files:', err);
+        res.status(500).json({ message: 'Failed to fetch files' });
+    }
+});
+
+// Download specific file
+app.get('/api/files/:id', authenticate, async (req, res) => {
+    try {
+        const file = await File.findOne({
+            _id: req.params.id,
+            userId: req.userId
+        });
+
+        if (!file) {
+            return res.status(404).json({ message: 'File not found' });
+        }
+
+        if (!fs.existsSync(file.path)) {
+            return res.status(404).json({ message: 'File no longer available' });
+        }
+
+        res.download(file.path, file.processedName, (err) => {
+            if (err) console.error('Download error:', err);
+        });
+    } catch (err) {
+        console.error('File download error:', err);
+        res.status(500).json({ message: 'Failed to download file' });
+    }
+});
 // Helper functions
 async function sendFileResponse(res, result, originalName) {
     const fileRecord = new File({
