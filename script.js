@@ -31,7 +31,82 @@ const userDropdown = document.getElementById('userDropdown');
 const userNameSpan = document.getElementById('userName');
 const logoutBtn = document.getElementById('logoutBtn');
 const myFilesBtn = document.getElementById('myFiles');
+// Update the processComplete function to handle actual downloads
+async function processComplete() {
+    progressBar.style.backgroundColor = 'var(--success)';
+    resultContainer.style.display = 'block';
 
+    try {
+        const formData = new FormData();
+        selectedFiles.forEach(file => formData.append('files', file));
+
+        // Add tool type to the request
+        formData.append('tool', currentTool);
+
+        // Add user token if logged in
+        const token = localStorage.getItem('token');
+        if (token) {
+            formData.append('token', token);
+        }
+
+        const response = await fetch(`/api/${currentTool}`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        // Handle the file download
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        
+        // Set appropriate filename based on tool
+        let filename = 'document';
+        switch(currentTool) {
+            case 'merge': filename = 'merged.pdf'; break;
+            case 'split': filename = 'split_pages.zip'; break;
+            case 'compress': filename = 'compressed.pdf'; break;
+            case 'word': filename = 'converted.docx'; break;
+            case 'excel': filename = 'converted.xlsx'; break;
+            default: filename = 'converted.pdf';
+        }
+        
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
+
+        // Show success message
+        resultContainer.innerHTML = `
+            <h3>Process Complete!</h3>
+            <p>Your file has been processed successfully.</p>
+            <p>If the download didn't start automatically, <a href="#" id="manualDownload">click here</a>.</p>
+            <button class="btn btn-primary" onclick="toolModal.style.display='none'">Close</button>
+        `;
+
+        // Handle manual download
+        document.getElementById('manualDownload').addEventListener('click', (e) => {
+            e.preventDefault();
+            a.click();
+        });
+
+    } catch (err) {
+        console.error('Processing error:', err);
+        resultContainer.innerHTML = `
+            <h3>Error</h3>
+            <p>${err.message || 'Failed to process files'}</p>
+            <button class="btn btn-primary" onclick="toolModal.style.display='none'">Close</button>
+        `;
+    } finally {
+        processBtn.disabled = false;
+        processBtn.textContent = 'Process Files';
+    }
+}
 // Check authentication status on page load
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
