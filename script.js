@@ -257,81 +257,130 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Process complete handler
-    async function processComplete() {
-        progressBar.style.backgroundColor = 'var(--success)';
-        resultContainer.style.display = 'block';
+   async function processComplete() {
+    progressBar.style.backgroundColor = 'var(--success)';
+    resultContainer.style.display = 'block';
 
-        try {
-            const formData = new FormData();
-            selectedFiles.forEach(file => formData.append('files', file));
-            
-            // Add tool type to the request
-            formData.append('tool', currentTool);
-            
-            // Add user token if logged in
-            const token = localStorage.getItem('token');
-            if (token) {
-                formData.append('token', token);
-            }
+    try {
+        const formData = new FormData();
+        selectedFiles.forEach(file => formData.append('files', file));
+        
+        formData.append('tool', currentTool);
+        
+        const token = localStorage.getItem('token');
+        if (token) {
+            formData.append('token', token);
+        }
 
-            const response = await fetch(`/api/${currentTool}`, {
-                method: 'POST',
-                body: formData
-            });
+        // Show processing status
+        resultContainer.innerHTML = `
+            <div class="processing-status">
+                <h3>Processing your files...</h3>
+                <p>Please wait while we prepare your download.</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 100%"></div>
+                </div>
+            </div>
+        `;
 
-            if (!response.ok) {
-                throw new Error(await response.text());
-            }
+        const response = await fetch(`/api/${currentTool}`, {
+            method: 'POST',
+            body: formData
+        });
 
-            // Handle the file download
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        // Create download link
+        const blob = await response.blob();
+        const downloadUrl = URL.createObjectURL(blob);
+        
+        // Set appropriate filename
+        let filename = 'document';
+        switch(currentTool) {
+            case 'merge': filename = 'merged.pdf'; break;
+            case 'split': filename = 'split_pages.zip'; break;
+            case 'compress': filename = 'compressed.pdf'; break;
+            case 'word': filename = 'converted.docx'; break;
+            case 'excel': filename = 'converted.xlsx'; break;
+            default: filename = 'converted.pdf';
+        }
+
+        // Show download options
+        resultContainer.innerHTML = `
+            <div class="download-options">
+                <h3>Your file is ready!</h3>
+                <p>Processed ${selectedFiles.length} file(s) successfully.</p>
+                
+                <div class="download-buttons">
+                    <button id="autoDownloadBtn" class="btn btn-primary">
+                        <i class="download-icon">↓</i> Download Now
+                    </button>
+                    <button id="manualDownloadBtn" class="btn btn-secondary">
+                        Download Later
+                    </button>
+                </div>
+                
+                <div class="additional-options">
+                    <a href="#" id="saveToAccount" class="save-option">
+                        <i class="save-icon">💾</i> Save to My Account
+                    </a>
+                </div>
+            </div>
+        `;
+
+        // Auto-download after short delay
+        setTimeout(() => {
+            const autoDownloadBtn = document.getElementById('autoDownloadBtn');
+            if (autoDownloadBtn) autoDownloadBtn.click();
+        }, 1000);
+
+        // Set up download buttons
+        document.getElementById('autoDownloadBtn').addEventListener('click', (e) => {
+            e.preventDefault();
             const a = document.createElement('a');
             a.href = downloadUrl;
-            
-            // Set appropriate filename based on tool
-            let filename = 'document';
-            switch(currentTool) {
-                case 'merge': filename = 'merged.pdf'; break;
-                case 'split': filename = 'split_pages.zip'; break;
-                case 'compress': filename = 'compressed.pdf'; break;
-                case 'word': filename = 'converted.docx'; break;
-                case 'excel': filename = 'converted.xlsx'; break;
-                default: filename = 'converted.pdf';
-            }
-            
             a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            window.URL.revokeObjectURL(downloadUrl);
-
+            
             // Show success message
-            resultContainer.innerHTML = `
-                <h3>Process Complete!</h3>
-                <p>Your file has been processed successfully.</p>
-                <p>If the download didn't start automatically, <a href="#" id="manualDownload">click here</a>.</p>
-                <button class="btn btn-primary" onclick="toolModal.style.display='none'">Close</button>
+            resultContainer.innerHTML += `
+                <div class="alert alert-success">
+                    Download started! Check your downloads folder.
+                </div>
             `;
+        });
 
-            // Handle manual download
-            document.getElementById('manualDownload').addEventListener('click', (e) => {
+        document.getElementById('manualDownloadBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            resultContainer.innerHTML += `
+                <div class="download-link">
+                    <p>Your download link:</p>
+                    <a href="${downloadUrl}" download="${filename}" class="btn btn-primary">
+                        Click to Download
+                    </a>
+                    <p class="small">Link valid for 24 hours</p>
+                </div>
+            `;
+        });
+
+        // Save to account functionality
+        if (currentUser) {
+            document.getElementById('saveToAccount').addEventListener('click', async (e) => {
                 e.preventDefault();
-                a.click();
-            });
-
-        } catch (err) {
-            console.error('Processing error:', err);
-            resultContainer.innerHTML = `
-                <h3>Error</h3>
-                <p>${err.message || 'Failed to process files'}</p>
-                <button class="btn btn-primary" onclick="toolModal.style.display='none'">Close</button>
-            `;
-        } finally {
-            processBtn.disabled = false;
-            processBtn.textContent = 'Process Files';
-        }
-    }
+                try {
+                    const saveResponse = await fetch('/api/files/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            tool: currentTool,
+                            
     
     // Show alert message
     function showAlert(message, type) {
