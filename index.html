@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PDFMaster is your all-in-one online PDF solution offering powerful, easy-to-use tools for all your document needs. Merge, split, compress, convert and more." />
     <meta name="keywords" content="PDF tools, Merge PDF, Split PDF, Compress PDF, PDF to Word, PDF to Excel, Free PDF editor, Online PDF converter" />
-    <title>PDF Tools - Merge, Split, Convert PDFs</title>
+    <title>PDFMaster - Advanced PDF Tools</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style> 
+    <style>
         :root {
             --primary: #4361ee;
             --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
             --light: #f8f9fa;
             --dark: #212529;
             --success: #4cc9f0;
@@ -19,6 +20,8 @@
         
         body {
             font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
             margin: 0;
             padding: 0;
             background-color: #f5f7ff;
@@ -30,16 +33,20 @@
             padding: 0 20px;
         }
         
+        /* Header Styles */
         header {
             background-color: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 20px 0;
         }
         
         .logo {
@@ -51,13 +58,18 @@
         
         .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 30px;
         }
         
         .nav-links a {
             color: var(--dark);
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
         }
         
         .btn {
@@ -66,6 +78,7 @@
             border-radius: 6px;
             font-weight: 600;
             text-decoration: none;
+            transition: all 0.3s;
             cursor: pointer;
             border: none;
         }
@@ -73,40 +86,95 @@
         .btn-primary {
             background-color: var(--primary);
             color: white;
+            border: 2px solid var(--primary);
         }
         
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        /* Hero Section */
         .hero {
-            text-align: center;
             padding: 80px 0;
+            text-align: center;
         }
         
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: #6c757d;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        /* File Upload Area */
         .upload-area {
             background-color: white;
             border-radius: 12px;
             padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
             border: 2px dashed #dee2e6;
             text-align: center;
-            margin-bottom: 40px;
+            transition: all 0.3s;
         }
         
+        .upload-area:hover {
+            border-color: var(--primary);
+        }
+        
+        .upload-area h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        /* Tools Grid */
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
         }
         
         .tool-card {
             background-color: white;
             border-radius: 10px;
-            padding: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
-            transition: transform 0.3s;
         }
         
         .tool-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         
+        .tool-icon {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .tool-card h3 {
+            margin-bottom: 15px;
+        }
+        
+        
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -115,6 +183,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
         }
@@ -125,6 +194,180 @@
             border-radius: 10px;
             width: 80%;
             max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close-modal {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--primary);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        /* Auth Modal */
+        .auth-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .auth-tab.active {
+            border-bottom: 2px solid var(--primary);
+            font-weight: 600;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h4 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column ul li a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column ul li a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #495057;
+            color: #adb5bd;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* User dropdown */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1;
+            border-radius: 4px;
+        }
+        
+        .dropdown-content a {
+            color: var(--dark);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .user-dropdown:hover .dropdown-content {
+            display: block;
         }
     </style>
 </head>
@@ -132,11 +375,22 @@
     <header>
         <div class="container">
             <nav class="navbar">
-                <a href="#" class="logo">PDF Tools</a>
+                <a href="#" class="logo">PDFMaster</a>
                 <div class="nav-links">
                     <a href="#">Home</a>
                     <a href="#tools">Tools</a>
-                    <a href="#" id="loginBtn">Sign In</a>
+                    <a href="#about">About</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div>
+                    <a href="#" class="btn btn-primary" id="authBtn">Sign In</a>
+                    <div class="user-dropdown" id="userDropdown" style="display: none;">
+                        <span id="userEmail"></span>
+                        <div class="dropdown-content">
+                            <a href="#" id="myFilesBtn">My Files</a>
+                            <a href="#" id="logoutBtn">Logout</a>
+                        </div>
+                    </div>
                 </div>
             </nav>
         </div>
@@ -145,57 +399,680 @@
     <main>
         <section class="hero">
             <div class="container">
-                <h1>Your Complete PDF Solution</h1>
-                <p>Merge, split, compress, and convert PDF files with ease</p>
+                <h1>All Your PDF Tools in One Place</h1>
+                <p>Merge, split, compress, convert and edit PDF files with our powerful online tools. Fast, secure and free to use!</p>
                 <a href="#tools" class="btn btn-primary">Get Started</a>
             </div>
         </section>
         
         <section class="container" id="tools">
             <div class="upload-area" id="uploadArea">
-                <h3>Drag & Drop PDF Files Here</h3>
+                <div class="upload-icon">📁</div>
+                <h3>Drag & Drop Your PDF Files Here</h3>
                 <p>or</p>
-                <button class="btn btn-primary" id="browseBtn">Browse Files</button>
-                <input type="file" id="fileInput" style="display: none;" multiple>
+                <button class="btn btn-primary" id="browseFiles">Browse Files</button>
+                <input type="file" id="fileInput" accept=".pdf" style="display: none;" multiple>
             </div>
             
+            <h2>Popular PDF Tools</h2>
             <div class="tools-grid">
                 <div class="tool-card" data-tool="merge">
+                    <div class="tool-icon">🔗</div>
                     <h3>Merge PDF</h3>
-                    <p>Combine multiple PDFs into one</p>
+                    <p>Combine multiple PDF files into one document in seconds.</p>
                 </div>
+                
                 <div class="tool-card" data-tool="split">
+                    <div class="tool-icon">✂️</div>
                     <h3>Split PDF</h3>
-                    <p>Extract pages or split by ranges</p>
+                    <p>Extract pages or split your PDF into multiple files.</p>
                 </div>
+                
                 <div class="tool-card" data-tool="compress">
+                    <div class="tool-icon">🗜️</div>
                     <h3>Compress PDF</h3>
-                    <p>Reduce file size</p>
+                    <p>Reduce PDF file size while maintaining quality.</p>
                 </div>
+                
                 <div class="tool-card" data-tool="word">
+                    <div class="tool-icon">📝</div>
                     <h3>PDF to Word</h3>
-                    <p>Convert to editable DOCX</p>
+                    <p>Convert PDF files to editable Word documents.</p>
                 </div>
+                
                 <div class="tool-card" data-tool="excel">
+                    <div class="tool-icon">📊</div>
                     <h3>PDF to Excel</h3>
-                    <p>Extract tables to spreadsheets</p>
+                    <p>Extract tables from PDF to Excel spreadsheets.</p>
+                </div>
+                
+                <div class="tool-card" data-tool="convert">
+                    <div class="tool-icon">🔄</div>
+                    <h3>Convert PDF</h3>
+                    <p>Convert to and from JPG, PNG, PPT and more.</p>
                 </div>
             </div>
         </section>
     </main>
     
-    <div class="modal" id="authModal">
+    <!-- Tool Modal -->
+    <div class="modal" id="toolModal">
         <div class="modal-content">
-            <h2>Sign In</h2>
-            <form id="authForm">
-                <input type="email" placeholder="Email" required>
-                <input type="password" placeholder="Password" required>
-                <button type="submit" class="btn btn-primary">Continue</button>
-            </form>
+            <span class="close-modal">&times;</span>
+            <h2 id="modalTitle">Merge PDF Files</h2>
+            <div id="modalContent">
+                <div class="upload-area" id="modalUploadArea">
+                    <div class="upload-icon">📁</div>
+                    <h3>Drag & Drop Your PDF Files Here</h3>
+                    <p>or</p>
+                    <button class="btn btn-primary" id="modalBrowseFiles">Browse Files</button>
+                    <input type="file" id="modalFileInput" accept=".pdf" style="display: none;" multiple>
+                </div>
+                <div id="fileList"></div>
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <button class="btn btn-primary" id="processBtn" style="display: none; margin-top: 20px;">Process Files</button>
+                <div id="resultContainer" style="display: none; margin-top: 20px;"></div>
+            </div>
         </div>
     </div>
     
-    <script src="auth.js"></script>
-    <script src="script.js"></script>
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="auth-modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Login</div>
+                <div class="auth-tab" data-tab="register">Register</div>
+            </div>
+            
+            <div class="auth-form active" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button class="btn btn-primary" id="loginBtn">Login</button>
+            </div>
+            
+            <div class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button class="btn btn-primary" id="registerBtn">Register</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>PDFMaster</h4>
+                    <p>Your all-in-one solution for PDF files. Fast, secure and easy to use online tools.</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Tools</h4>
+                    <ul>
+                        <li><a href="#">Merge PDF</a></li>
+                        <li><a href="#">Split PDF</a></li>
+                        <li><a href="#">Compress PDF</a></li>
+                        <li><a href="#">PDF to Word</a></li>
+                        <li><a href="#">PDF to Excel</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 PDFMaster. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Authentication and User Management (optional)
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const authBtn = document.getElementById('authBtn');
+            const authModal = document.getElementById('authModal');
+            const toolModal = document.getElementById('toolModal');
+            const closeModals = document.querySelectorAll('.close-modal');
+            const authTabs = document.querySelectorAll('.auth-tab');
+            const authForms = document.querySelectorAll('.auth-form');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginBtn = document.getElementById('loginBtn');
+            const registerBtn = document.getElementById('registerBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            const userEmail = document.getElementById('userEmail');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const myFilesBtn = document.getElementById('myFilesBtn');
+            
+            // Check if user is already logged in
+            const token = localStorage.getItem('token');
+            if (token) {
+                updateAuthUI(true);
+            }
+            
+            // Auth button click handler
+            authBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                authModal.style.display = 'flex';
+            });
+            
+            // Close modal handlers
+            closeModals.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    authModal.style.display = 'none';
+                    toolModal.style.display = 'none';
+                });
+            });
+            
+            // Click outside modal to close
+            window.addEventListener('click', function(e) {
+                if (e.target === authModal) {
+                    authModal.style.display = 'none';
+                }
+                if (e.target === toolModal) {
+                    toolModal.style.display = 'none';
+                }
+            });
+            
+            // Auth tab switching
+            authTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    authTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding form
+                    const tabName = this.getAttribute('data-tab');
+                    authForms.forEach(form => form.classList.remove('active'));
+                    document.getElementById(`${tabName}Form`).classList.add('active');
+                });
+            });
+            
+            // Login handler (simplified for demo)
+            loginBtn.addEventListener('click', async function() {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                // Simple validation
+                if (!email || !password) {
+                    alert('Please enter both email and password');
+                    return;
+                }
+                
+                // For demo purposes, just store the email
+                localStorage.setItem('token', 'demo-token');
+                localStorage.setItem('userEmail', email);
+                updateAuthUI(true, email);
+                authModal.style.display = 'none';
+                alert('Login successful! (Demo mode)');
+            });
+            
+            // Register handler (simplified for demo)
+            registerBtn.addEventListener('click', async function() {
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                // For demo purposes, just store the email
+                localStorage.setItem('token', 'demo-token');
+                localStorage.setItem('userEmail', email);
+                updateAuthUI(true, email);
+                authModal.style.display = 'none';
+                alert('Registration successful! (Demo mode)');
+            });
+            
+            // Logout handler
+            logoutBtn.addEventListener('click', function() {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userEmail');
+                updateAuthUI(false);
+                alert('Logged out successfully');
+            });
+            
+            // Update UI based on auth state
+            function updateAuthUI(isLoggedIn, email = '') {
+                if (isLoggedIn) {
+                    authBtn.style.display = 'none';
+                    userDropdown.style.display = 'block';
+                    userEmail.textContent = localStorage.getItem('userEmail') || email;
+                } else {
+                    authBtn.style.display = 'block';
+                    userDropdown.style.display = 'none';
+                }
+            }
+        });
+        
+        // PDF Tools Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const toolCards = document.querySelectorAll('.tool-card');
+            const uploadArea = document.getElementById('uploadArea');
+            const browseFilesBtn = document.getElementById('browseFiles');
+            const fileInput = document.getElementById('fileInput');
+            const toolModal = document.getElementById('toolModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalUploadArea = document.getElementById('modalUploadArea');
+            const modalBrowseFiles = document.getElementById('modalBrowseFiles');
+            const modalFileInput = document.getElementById('modalFileInput');
+            const fileList = document.getElementById('fileList');
+            const processBtn = document.getElementById('processBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const resultContainer = document.getElementById('resultContainer');
+            
+            let currentTool = '';
+            let selectedFiles = [];
+            
+            // Tool Card Click Handlers
+            toolCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    currentTool = this.getAttribute('data-tool');
+                    openToolModal(currentTool);
+                });
+            });
+            
+            // Open Tool Modal
+            function openToolModal(tool) {
+                const toolTitles = {
+                    'merge': 'Merge PDF Files',
+                    'split': 'Split PDF File',
+                    'compress': 'Compress PDF File',
+                    'word': 'Convert PDF to Word',
+                    'excel': 'Convert PDF to Excel',
+                    'convert': 'Convert PDF File'
+                };
+                
+                modalTitle.textContent = toolTitles[tool] || 'PDF Tool';
+                toolModal.style.display = 'flex';
+                
+                // Reset modal content
+                fileList.innerHTML = '';
+                selectedFiles = [];
+                processBtn.style.display = 'none';
+                progressContainer.style.display = 'none';
+                resultContainer.style.display = 'none';
+                resultContainer.innerHTML = '';
+                
+                // Reset process button
+                processBtn.textContent = 'Process Files';
+                processBtn.disabled = false;
+                processBtn.onclick = processFiles;
+            }
+            
+            // File Upload Handling
+            function setupFileUpload(uploadArea, fileInput, callback) {
+                // Prevent default drag behaviors
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                // Highlight drop area when item is dragged over it
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, highlight, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    uploadArea.addEventListener(eventName, unhighlight, false);
+                });
+                
+                function highlight() {
+                    uploadArea.style.borderColor = 'var(--primary)';
+                    uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
+                }
+                
+                function unhighlight() {
+                    uploadArea.style.borderColor = '#dee2e6';
+                    uploadArea.style.backgroundColor = 'white';
+                }
+                
+                // Handle dropped files
+                uploadArea.addEventListener('drop', handleDrop, false);
+                
+                function handleDrop(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    callback(files);
+                }
+                
+                // Handle file input
+                fileInput.addEventListener('change', function() {
+                    callback(this.files);
+                });
+            }
+            
+            // Main upload area
+            setupFileUpload(uploadArea, fileInput, function(files) {
+                if (files.length > 0) {
+                    openToolModal('merge');
+                    handleFiles(files);
+                }
+            });
+            
+            // Modal upload area
+            setupFileUpload(modalUploadArea, modalFileInput, function(files) {
+                if (files.length > 0) {
+                    handleFiles(files);
+                }
+            });
+            
+            // Browse files buttons
+            browseFilesBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            modalBrowseFiles.addEventListener('click', function() {
+                modalFileInput.click();
+            });
+            
+            // Handle selected files
+            function handleFiles(files) {
+                const newFiles = Array.from(files).filter(file => 
+                    file.type === 'application/pdf' || file.name.endsWith('.pdf')
+                );
+                
+                if (newFiles.length === 0) {
+                    alert('Please select PDF files only.');
+                    return;
+                }
+                
+                selectedFiles = [...selectedFiles, ...newFiles];
+                displayFileList();
+                
+                if (selectedFiles.length > 0) {
+                    processBtn.style.display = 'block';
+                }
+            }
+            
+            // Display list of selected files
+            function displayFileList() {
+                fileList.innerHTML = '<h3>Selected Files:</h3>';
+                
+                if (selectedFiles.length === 0) {
+                    fileList.innerHTML += '<p>No files selected</p>';
+                    return;
+                }
+                
+                const list = document.createElement('ul');
+                list.style.listStyleType = 'none';
+                list.style.padding = '0';
+                
+                selectedFiles.forEach((file, index) => {
+                    const item = document.createElement('li');
+                    item.style.display = 'flex';
+                    item.style.justifyContent = 'space-between';
+                    item.style.alignItems = 'center';
+                    item.style.marginBottom = '10px';
+                    item.style.padding = '10px';
+                    item.style.backgroundColor = '#f8f9fa';
+                    item.style.borderRadius = '5px';
+                    
+                    const fileInfo = document.createElement('div');
+                    fileInfo.textContent = `${file.name} (${formatFileSize(file.size)})`;
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = 'Remove';
+                    removeBtn.classList.add('btn');
+                    removeBtn.style.backgroundColor = 'var(--danger)';
+                    removeBtn.style.borderColor = 'var(--danger)';
+                    
+                    removeBtn.addEventListener('click', function() {
+                        selectedFiles.splice(index, 1);
+                        displayFileList();
+                        
+                        if (selectedFiles.length === 0) {
+                            processBtn.style.display = 'none';
+                        }
+                    });
+                    
+                    item.appendChild(fileInfo);
+                    item.appendChild(removeBtn);
+                    list.appendChild(item);
+                });
+                
+                fileList.appendChild(list);
+            }
+            
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // Process files (client-side simulation)
+            async function processFiles() {
+                if (selectedFiles.length === 0) return;
+                
+                // Validate files based on tool
+                if (currentTool === 'merge' && selectedFiles.length < 2) {
+                    alert('Please select at least 2 files to merge');
+                    return;
+                }
+                
+                // Disable button during processing
+                processBtn.disabled = true;
+                processBtn.textContent = 'Processing...';
+                progressContainer.style.display = 'block';
+                
+                try {
+                    // Show processing status
+                    resultContainer.style.display = 'block';
+                    resultContainer.innerHTML = `
+                        <div class="processing-status">
+                            <h3>Processing your files...</h3>
+                            <p>Please wait while we prepare your download.</p>
+                        </div>
+                    `;
+                    
+                    // Simulate progress
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += 5;
+                        progressBar.style.width = `${progress}%`;
+                        
+                        if (progress >= 100) {
+                            clearInterval(progressInterval);
+                            createAndDownloadPDF();
+                        }
+                    }, 100);
+                    
+                } catch (err) {
+                    console.error('Processing error:', err);
+                    resultContainer.innerHTML = `
+                        <div class="error-message">
+                            <h3>Error Processing Files</h3>
+                            <p>${err.message || 'An unknown error occurred'}</p>
+                        </div>
+                    `;
+                    processBtn.disabled = false;
+                    processBtn.textContent = 'Process Files';
+                }
+            }
+            
+            // Create and download a proper PDF file
+            function createAndDownloadPDF() {
+                try {
+                    // In a real application, you would send the files to your backend
+                    // and receive the processed PDF. For this demo, we'll create a simple PDF.
+                    
+                    // Create a minimal PDF file (this is a very basic PDF structure)
+                    const pdfContent = [
+                        '%PDF-1.0',
+                        '1 0 obj',
+                        '<< /Type /Catalog /Pages 2 0 R >>',
+                        'endobj',
+                        '2 0 obj',
+                        '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+                        'endobj',
+                        '3 0 obj',
+                        '<< /Type /Page /Parent 2 0 R /Resources <<>> /Contents 4 0 R >>',
+                        'endobj',
+                        '4 0 obj',
+                        '<< /Length 44 >>',
+                        'stream',
+                        'BT /F1 12 Tf 72 720 Td (Processed by PDFMaster) Tj ET',
+                        'BT /F1 12 Tf 72 700 Td (Tool: ' + currentTool + ') Tj ET',
+                        'endstream',
+                        'endobj',
+                        'xref',
+                        '0 5',
+                        '0000000000 65535 f ',
+                        '0000000009 00000 n ',
+                        '0000000058 00000 n ',
+                        '0000000111 00000 n ',
+                        '0000000202 00000 n ',
+                        'trailer',
+                        '<< /Size 5 /Root 1 0 R >>',
+                        'startxref',
+                        '307',
+                        '%%EOF'
+                    ].join('\n');
+                    
+                    // Create a Blob with the PDF content
+                    const blob = new Blob([pdfContent], { type: 'application/pdf' });
+                    const downloadUrl = URL.createObjectURL(blob);
+                    
+                    // Set appropriate filename based on tool
+                    let filename = 'document';
+                    switch(currentTool) {
+                        case 'merge': filename = 'merged.pdf'; break;
+                        case 'split': filename = 'split_pages.pdf'; break;
+                        case 'compress': filename = 'compressed.pdf'; break;
+                        case 'word': filename = 'converted.pdf'; break;
+                        case 'excel': filename = 'converted.pdf'; break;
+                        default: filename = 'converted.pdf';
+                    }
+                    
+                    // Create download link and trigger click
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(downloadUrl);
+                    }, 100);
+                    
+                    // Show success message
+                    resultContainer.innerHTML = `
+                        <div class="download-complete">
+                            <h3>Processing Complete!</h3>
+                            <p>Your file has been downloaded successfully.</p>
+                            <p>If the download didn't start automatically, <a href="#" id="manualDownload">click here</a> to download again.</p>
+                        </div>
+                    `;
+                    
+                    // Handle manual download
+                    document.getElementById('manualDownload')?.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        a.click();
+                    });
+                    
+                } catch (err) {
+                    resultContainer.innerHTML = `
+                        <div class="error-message">
+                            <h3>Error Creating File</h3>
+                            <p>${err.message || 'Failed to create PDF file'}</p>
+                        </div>
+                    `;
+                } finally {
+                    processBtn.disabled = false;
+                    processBtn.textContent = 'Process Files';
+                }
+            }
+            
+            // Simulate file processing and download
+            function simulateFileProcessing() {
+                // Create a dummy blob for download
+                const blob = new Blob(['This is a simulated PDF file download. In a real application, this would be your processed file.'], { type: 'application/pdf' });
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                
+                // Set appropriate filename based on tool
+                let filename = 'document';
+                switch(currentTool) {
+                    case 'merge': filename = 'merged.pdf'; break;
+                    case 'split': filename = 'split_pages.zip'; break;
+                    case 'compress': filename = 'compressed.pdf'; break;
+                    case 'word': filename = 'converted.docx'; break;
+                    case 'excel': filename = 'converted.xlsx'; break;
+                    default: filename = 'converted.pdf';
+                }
+                
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(downloadUrl);
+                
+                // Show success message
+                resultContainer.innerHTML = `
+                    <div class="download-complete">
+                        <h3>Processing Complete!</h3>
+                        <p>Your file has been processed successfully.</p>
+                        <p>If the download didn't start automatically, <a href="#" id="manualDownload">click here</a> to download.</p>
+                    </div>
+                `;
+                processBtn.disabled = false;
+                processBtn.textContent = 'Process Files';
+            }
+        });
+    </script>
 </body>
 </html>
