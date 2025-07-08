@@ -1,33 +1,24 @@
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const multer = require('multer');
-const path = require('path');
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
+const { PDFDocument } = require('pdf-lib');
 const fs = require('fs');
-const connectDB = require('./config/db');
-const authRoutes = require('./auth');
-const { processFiles } = require('./fileProcessor');
-const File = require('./models/File');
+const path = require('path');
+const AdmZip = require('adm-zip');
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Connect to database
-connectDB();
-
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
 
 // Configure file upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadDir = path.join(__dirname, 'uploads');
         if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
+            fs.mkdirSync(uploadDir);
         }
         cb(null, uploadDir);
     },
@@ -38,158 +29,100 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Create output directory
+// Create output directory if it doesn't exist
 const outputDir = path.join(__dirname, 'output');
 if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
+    fs.mkdirSync(outputDir);
 }
 
-// Routes
-app.use('/api/auth', authRoutes);
-
-// Authentication middleware
-function authenticate(req, res, next) {
-    const token = req.body.token || req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ message: 'Authentication required' });
-    }
-
+// PDF Merge Endpoint
+app.post('/api/merge', upload.array('files', 10), async (req, res) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.userId = decoded.id;
-        next();
-    } catch (err) {
-        res.status(401).json({ message: 'Invalid token' });
-    }
-}
-
-// File processing routes
-app.post('/api/merge', authenticate, upload.array('files', 10), async (req, res) => {
-    try {
-        const result = await processFiles('merge', req.files, req.userId);
-        await sendFileResponse(res, result, req.files.map(f => f.originalname).join(', '));
-    } catch (err) {
-        handleError(res, err, 'merge');
-    }
-});
-
-app.post('/api/split', authenticate, upload.single('file'), async (req, res) => {
-    try {
-        const result = await processFiles('split', [req.file], req.userId);
-        await sendFileResponse(res, result, req.file.originalname);
-    } catch (err) {
-        handleError(res, err, 'split');
-    }
-});
-
-app.post('/api/compress', authenticate, upload.single('file'), async (req, res) => {
-    try {
-        const result = await processFiles('compress', [req.file], req.userId);
-        await sendFileResponse(res, result, req.file.originalname);
-    } catch (err) {
-        handleError(res, err, 'compress');
-    }
-});
-
-app.post('/api/word', authenticate, upload.single('file'), async (req, res) => {
-    try {
-        const result = await processFiles('word', [req.file], req.userId);
-        await sendFileResponse(res, result, req.file.originalname);
-    } catch (err) {
-        handleError(res, err, 'word');
-    }
-});
-
-app.post('/api/excel', authenticate, upload.single('file'), async (req, res) => {
-    try {
-        const result = await processFiles('excel', [req.file], req.userId);
-        await sendFileResponse(res, result, req.file.originalname);
-    } catch (err) {
-        handleError(res, err, 'excel');
-    }
-});
-// Add to server.js after other routes
-
-// Get user's files
-app.get('/api/files', authenticate, async (req, res) => {
-    try {
-        const files = await File.find({ userId: req.userId })
-            .sort({ createdAt: -1 })
-            .limit(50);
-        res.json(files);
-    } catch (err) {
-        console.error('Error fetching files:', err);
-        res.status(500).json({ message: 'Failed to fetch files' });
-    }
-});
-
-// Download specific file
-app.get('/api/files/:id', authenticate, async (req, res) => {
-    try {
-        const file = await File.findOne({
-            _id: req.params.id,
-            userId: req.userId
-        });
-
-        if (!file) {
-            return res.status(404).json({ message: 'File not found' });
+        if (!req.files || req.files.length < 2) {
+            return res.status(400).json({ error: 'Please upload at least 2 PDF files' });
         }
 
-        if (!fs.existsSync(file.path)) {
-            return res.status(404).json({ message: 'File no longer available' });
+        const mergedPdf = await PDFDocument.create();
+        
+        for (const file of req.files) {
+            const pdfBytes = fs.readFileSync(file.path);
+            const pdfDoc = await PDFDocument.load(pdfBytes);
+            const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+            pages.forEach(page => mergedPdf.addPage(page));
+            
+            // Delete the uploaded file after processing
+            fs.unlinkSync(file.path);
         }
 
-        res.download(file.path, file.processedName, (err) => {
-            if (err) console.error('Download error:', err);
+        const mergedPdfBytes = await mergedPdf.save();
+        const outputPath = path.join(outputDir, `merged-${Date.now()}.pdf`);
+        fs.writeFileSync(outputPath, mergedPdfBytes);
+        
+        res.download(outputPath, 'merged.pdf', (err) => {
+            if (err) {
+                console.error('Download error:', err);
+            }
+            fs.unlinkSync(outputPath);
         });
     } catch (err) {
-        console.error('File download error:', err);
-        res.status(500).json({ message: 'Failed to download file' });
+        console.error('Merge error:', err);
+        res.status(500).json({ error: 'Failed to merge PDFs', details: err.message });
     }
 });
-// Helper functions
-async function sendFileResponse(res, result, originalName) {
-    const fileRecord = new File({
-        userId: res.req.userId,
-        toolType: res.req.route.path.split('/')[2],
-        originalName,
-        processedName: result.filename,
-        path: result.filepath,
-        size: result.size,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-    });
-    await fileRecord.save();
 
-    res.download(result.filepath, result.filename, (err) => {
-        if (err) console.error('Download error:', err);
-        fs.unlinkSync(result.filepath);
-    });
-}
+// PDF Split Endpoint
+app.post('/api/split', upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'Please upload a PDF file' });
+        }
 
-function handleError(res, err, operation) {
-    console.error(`${operation} error:`, err);
-    res.status(500).json({ 
-        message: `Failed to ${operation} file`,
-        error: err.message 
-    });
-}
+        const pdfBytes = fs.readFileSync(req.file.path);
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const pageCount = pdfDoc.getPageCount();
+        
+        // Split each page into separate PDF
+        const zip = new AdmZip();
+        
+        for (let i = 0; i < pageCount; i++) {
+            const newPdf = await PDFDocument.create();
+            const [page] = await newPdf.copyPages(pdfDoc, [i]);
+            newPdf.addPage(page);
+            const newPdfBytes = await newPdf.save();
+            zip.addFile(`page-${i+1}.pdf`, Buffer.from(newPdfBytes));
+        }
+        
+        const zipData = zip.toBuffer();
+        const zipPath = path.join(outputDir, `split-${Date.now()}.zip`);
+        fs.writeFileSync(zipPath, zipData);
+        
+        res.download(zipPath, 'split_pages.zip', (err) => {
+            if (err) {
+                console.error('Download error:', err);
+            }
+            fs.unlinkSync(zipPath);
+            fs.unlinkSync(req.file.path);
+        });
+    } catch (err) {
+        console.error('Split error:', err);
+        res.status(500).json({ error: 'Failed to split PDF', details: err.message });
+    }
+});
 
 // Start server
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
 
-// Clean up old files
+// Clean up old files periodically
 setInterval(() => {
     const now = Date.now();
     const oneHour = 60 * 60 * 1000;
     
-    ['uploads', 'output'].forEach(dir => {
-        const dirPath = path.join(__dirname, dir);
-        if (fs.existsSync(dirPath)) {
-            fs.readdirSync(dirPath).forEach(file => {
-                const filePath = path.join(dirPath, file);
+    [path.join(__dirname, 'uploads'), outputDir].forEach(dir => {
+        if (fs.existsSync(dir)) {
+            fs.readdirSync(dir).forEach(file => {
+                const filePath = path.join(dir, file);
                 const stat = fs.statSync(filePath);
                 if (now - stat.mtimeMs > oneHour) {
                     fs.unlinkSync(filePath);
@@ -197,4 +130,4 @@ setInterval(() => {
             });
         }
     });
-}, 60 * 60 * 1000);
+}, 60 * 60 * 1000); // Run every hour
