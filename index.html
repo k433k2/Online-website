@@ -173,7 +173,6 @@
             margin-bottom: 15px;
         }
         
-        
         /* Modal */
         .modal {
             display: none;
@@ -924,7 +923,7 @@
                         
                         if (progress >= 100) {
                             clearInterval(progressInterval);
-                            createAndDownloadPDF();
+                            simulateFileProcessing();
                         }
                     }, 100);
                     
@@ -936,101 +935,6 @@
                             <p>${err.message || 'An unknown error occurred'}</p>
                         </div>
                     `;
-                    processBtn.disabled = false;
-                    processBtn.textContent = 'Process Files';
-                }
-            }
-            
-            // Create and download a proper PDF file
-            function createAndDownloadPDF() {
-                try {
-                    // In a real application, you would send the files to your backend
-                    // and receive the processed PDF. For this demo, we'll create a simple PDF.
-                    
-                    // Create a minimal PDF file (this is a very basic PDF structure)
-                    const pdfContent = [
-                        '%PDF-1.0',
-                        '1 0 obj',
-                        '<< /Type /Catalog /Pages 2 0 R >>',
-                        'endobj',
-                        '2 0 obj',
-                        '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-                        'endobj',
-                        '3 0 obj',
-                        '<< /Type /Page /Parent 2 0 R /Resources <<>> /Contents 4 0 R >>',
-                        'endobj',
-                        '4 0 obj',
-                        '<< /Length 44 >>',
-                        'stream',
-                        'BT /F1 12 Tf 72 720 Td (Processed by PDFMaster) Tj ET',
-                        'BT /F1 12 Tf 72 700 Td (Tool: ' + currentTool + ') Tj ET',
-                        'endstream',
-                        'endobj',
-                        'xref',
-                        '0 5',
-                        '0000000000 65535 f ',
-                        '0000000009 00000 n ',
-                        '0000000058 00000 n ',
-                        '0000000111 00000 n ',
-                        '0000000202 00000 n ',
-                        'trailer',
-                        '<< /Size 5 /Root 1 0 R >>',
-                        'startxref',
-                        '307',
-                        '%%EOF'
-                    ].join('\n');
-                    
-                    // Create a Blob with the PDF content
-                    const blob = new Blob([pdfContent], { type: 'application/pdf' });
-                    const downloadUrl = URL.createObjectURL(blob);
-                    
-                    // Set appropriate filename based on tool
-                    let filename = 'document';
-                    switch(currentTool) {
-                        case 'merge': filename = 'merged.pdf'; break;
-                        case 'split': filename = 'split_pages.pdf'; break;
-                        case 'compress': filename = 'compressed.pdf'; break;
-                        case 'word': filename = 'converted.pdf'; break;
-                        case 'excel': filename = 'converted.pdf'; break;
-                        default: filename = 'converted.pdf';
-                    }
-                    
-                    // Create download link and trigger click
-                    const a = document.createElement('a');
-                    a.href = downloadUrl;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    
-                    // Clean up
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(downloadUrl);
-                    }, 100);
-                    
-                    // Show success message
-                    resultContainer.innerHTML = `
-                        <div class="download-complete">
-                            <h3>Processing Complete!</h3>
-                            <p>Your file has been downloaded successfully.</p>
-                            <p>If the download didn't start automatically, <a href="#" id="manualDownload">click here</a> to download again.</p>
-                        </div>
-                    `;
-                    
-                    // Handle manual download
-                    document.getElementById('manualDownload')?.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        a.click();
-                    });
-                    
-                } catch (err) {
-                    resultContainer.innerHTML = `
-                        <div class="error-message">
-                            <h3>Error Creating File</h3>
-                            <p>${err.message || 'Failed to create PDF file'}</p>
-                        </div>
-                    `;
-                } finally {
                     processBtn.disabled = false;
                     processBtn.textContent = 'Process Files';
                 }
@@ -1069,6 +973,13 @@
                         <p>If the download didn't start automatically, <a href="#" id="manualDownload">click here</a> to download.</p>
                     </div>
                 `;
+                
+                // Handle manual download
+                document.getElementById('manualDownload')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    a.click();
+                });
+                
                 processBtn.disabled = false;
                 processBtn.textContent = 'Process Files';
             }
