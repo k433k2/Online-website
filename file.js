@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
-const path = require('path');
-const fs = require('fs');
 
-// Define the schema for storing processed file information
 const FileSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -28,7 +25,12 @@ const FileSchema = new mongoose.Schema({
     },
     size: {
         type: Number,
-        required: true
+        required: true,
+        default: 0
+    },
+    downloadCount: {
+        type: Number,
+        default: 0
     },
     expiresAt: {
         type: Date,
@@ -40,24 +42,14 @@ const FileSchema = new mongoose.Schema({
     }
 });
 
-// TTL index to automatically delete expired file documents
+// Indexes
+FileSchema.index({ userId: 1 });
 FileSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-// Optional: virtual property to generate a download URL
-FileSchema.virtual('downloadUrl').get(function () {
-    return `/api/files/${this._id}`;
-});
-
-// Optional: Pre-remove hook to delete physical file from disk (not required unless managing files actively)
-FileSchema.pre('remove', function (next) {
-    if (fs.existsSync(this.path)) {
-        fs.unlink(this.path, (err) => {
-            if (err) console.error('Error deleting file from disk:', err);
-            next();
-        });
-    } else {
-        next();
-    }
-});
+// Increment download count when accessed
+FileSchema.methods.incrementDownload = function() {
+    this.downloadCount += 1;
+    return this.save();
+};
 
 module.exports = mongoose.model('File', FileSchema);
