@@ -25,17 +25,12 @@ exports.processFiles = async (toolType, files, userId) => {
 // Merge multiple PDFs
 async function mergePDFs(files, userId) {
     const mergedPdf = await PDFDocument.create();
-
+    
     for (const file of files) {
         const pdfBytes = fs.readFileSync(file.path);
         const pdfDoc = await PDFDocument.load(pdfBytes);
         const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
         pages.forEach(page => mergedPdf.addPage(page));
-
-        // Cleanup uploaded file
-        fs.unlink(file.path, err => {
-            if (err) console.error('Error deleting uploaded file:', file.path);
-        });
     }
 
     const mergedPdfBytes = await mergedPdf.save();
@@ -54,24 +49,19 @@ async function splitPDF(file, userId) {
     const pdfBytes = fs.readFileSync(file.path);
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const pageCount = pdfDoc.getPageCount();
-
+    
     const zip = new AdmZip();
-
+    
     for (let i = 0; i < pageCount; i++) {
         const newPdf = await PDFDocument.create();
         const [page] = await newPdf.copyPages(pdfDoc, [i]);
         newPdf.addPage(page);
         const newPdfBytes = await newPdf.save();
-        zip.addFile(`page-${i + 1}.pdf`, Buffer.from(newPdfBytes));
+        zip.addFile(`page-${i+1}.pdf`, Buffer.from(newPdfBytes));
     }
-
+    
     const zipPath = path.join(__dirname, '../output', `split-${Date.now()}.zip`);
     fs.writeFileSync(zipPath, zip.toBuffer());
-
-    // Cleanup uploaded file
-    fs.unlink(file.path, err => {
-        if (err) console.error('Error deleting uploaded file:', file.path);
-    });
 
     return {
         filename: 'split_pages.zip',
@@ -80,17 +70,12 @@ async function splitPDF(file, userId) {
     };
 }
 
-// Compress PDF (mock implementation)
+// Compress PDF (simplified example)
 async function compressPDF(file, userId) {
     const pdfBytes = fs.readFileSync(file.path);
     const outputPath = path.join(__dirname, '../output', `compressed-${Date.now()}.pdf`);
     fs.writeFileSync(outputPath, pdfBytes);
-
-    // Cleanup uploaded file
-    fs.unlink(file.path, err => {
-        if (err) console.error('Error deleting uploaded file:', file.path);
-    });
-
+    
     return {
         filename: 'compressed.pdf',
         filepath: outputPath,
@@ -98,16 +83,11 @@ async function compressPDF(file, userId) {
     };
 }
 
-// Convert to Word (mock implementation)
+// Convert to Word (simplified example)
 async function convertToWord(file, userId) {
     const outputPath = path.join(__dirname, '../output', `converted-${Date.now()}.docx`);
     fs.writeFileSync(outputPath, 'This would be a Word document in a real implementation');
-
-    // Cleanup uploaded file
-    fs.unlink(file.path, err => {
-        if (err) console.error('Error deleting uploaded file:', file.path);
-    });
-
+    
     return {
         filename: 'converted.docx',
         filepath: outputPath,
@@ -115,16 +95,11 @@ async function convertToWord(file, userId) {
     };
 }
 
-// Convert to Excel (mock implementation)
+// Convert to Excel (simplified example)
 async function convertToExcel(file, userId) {
     const outputPath = path.join(__dirname, '../output', `converted-${Date.now()}.xlsx`);
     fs.writeFileSync(outputPath, 'This would be an Excel file in a real implementation');
-
-    // Cleanup uploaded file
-    fs.unlink(file.path, err => {
-        if (err) console.error('Error deleting uploaded file:', file.path);
-    });
-
+    
     return {
         filename: 'converted.xlsx',
         filepath: outputPath,
