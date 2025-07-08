@@ -80,7 +80,6 @@
             text-decoration: none;
             transition: all 0.3s;
             cursor: pointer;
-            border: none;
         }
         
         .btn-primary {
@@ -155,7 +154,6 @@
             padding: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
         }
         
         .tool-card:hover {
@@ -171,105 +169,6 @@
         
         .tool-card h3 {
             margin-bottom: 15px;
-        }
-        
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .close-modal {
-            float: right;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        
-        .progress-bar {
-            height: 10px;
-            background-color: var(--primary);
-            border-radius: 5px;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        
-        /* Auth Modal */
-        .auth-modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-        }
-        
-        .auth-tabs {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        
-        .auth-tab {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 2px solid #dee2e6;
-        }
-        
-        .auth-tab.active {
-            border-bottom: 2px solid var(--primary);
-            font-weight: 600;
-        }
-        
-        .auth-form {
-            display: none;
-        }
-        
-        .auth-form.active {
-            display: block;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            font-size: 16px;
         }
         
         /* Footer */
@@ -316,58 +215,6 @@
             border-top: 1px solid #495057;
             color: #adb5bd;
         }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
-            .hero h1 {
-                font-size: 36px;
-            }
-            
-            .hero p {
-                font-size: 18px;
-            }
-            
-            .tools-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* User dropdown */
-        .user-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            z-index: 1;
-            border-radius: 4px;
-        }
-        
-        .dropdown-content a {
-            color: var(--dark);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-        
-        .dropdown-content a:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .user-dropdown:hover .dropdown-content {
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -377,19 +224,13 @@
                 <a href="#" class="logo">PDFMaster</a>
                 <div class="nav-links">
                     <a href="#">Home</a>
-                    <a href="#tools">Tools</a>
-                    <a href="#about">About</a>
-                    <a href="#contact">Contact</a>
+                    <a href="#">Tools</a>
+                    <a href="#">Pricing</a>
+                    <a href="#">About</a>
+                    <a href="#">Contact</a>
                 </div>
                 <div>
-                    <a href="#" class="btn btn-primary" id="authBtn">Sign In</a>
-                    <div class="user-dropdown" id="userDropdown" style="display: none;">
-                        <span id="userEmail"></span>
-                        <div class="dropdown-content">
-                            <a href="#" id="myFilesBtn">My Files</a>
-                            <a href="#" id="logoutBtn">Logout</a>
-                        </div>
-                    </div>
+                    <a href="#" class="btn btn-primary">Sign In</a>
                 </div>
             </nav>
         </div>
@@ -405,47 +246,46 @@
         </section>
         
         <section class="container" id="tools">
-            <div class="upload-area" id="uploadArea">
+            <div class="upload-area">
                 <div class="upload-icon">📁</div>
                 <h3>Drag & Drop Your PDF Files Here</h3>
                 <p>or</p>
-                <button class="btn btn-primary" id="browseFiles">Browse Files</button>
-                <input type="file" id="fileInput" accept=".pdf" style="display: none;" multiple>
+                <a href="#" class="btn btn-primary">Browse Files</a>
             </div>
             
             <h2>Popular PDF Tools</h2>
             <div class="tools-grid">
-                <div class="tool-card" data-tool="merge">
+                <div class="tool-card">
                     <div class="tool-icon">🔗</div>
                     <h3>Merge PDF</h3>
                     <p>Combine multiple PDF files into one document in seconds.</p>
                 </div>
                 
-                <div class="tool-card" data-tool="split">
+                <div class="tool-card">
                     <div class="tool-icon">✂️</div>
                     <h3>Split PDF</h3>
                     <p>Extract pages or split your PDF into multiple files.</p>
                 </div>
                 
-                <div class="tool-card" data-tool="compress">
+                <div class="tool-card">
                     <div class="tool-icon">🗜️</div>
                     <h3>Compress PDF</h3>
                     <p>Reduce PDF file size while maintaining quality.</p>
                 </div>
                 
-                <div class="tool-card" data-tool="word">
+                <div class="tool-card">
                     <div class="tool-icon">📝</div>
                     <h3>PDF to Word</h3>
                     <p>Convert PDF files to editable Word documents.</p>
                 </div>
                 
-                <div class="tool-card" data-tool="excel">
+                <div class="tool-card">
                     <div class="tool-icon">📊</div>
                     <h3>PDF to Excel</h3>
                     <p>Extract tables from PDF to Excel spreadsheets.</p>
                 </div>
                 
-                <div class="tool-card" data-tool="convert">
+                <div class="tool-card">
                     <div class="tool-icon">🔄</div>
                     <h3>Convert PDF</h3>
                     <p>Convert to and from JPG, PNG, PPT and more.</p>
@@ -453,68 +293,6 @@
             </div>
         </section>
     </main>
-    
-    <!-- Tool Modal -->
-    <div class="modal" id="toolModal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2 id="modalTitle">Merge PDF Files</h2>
-            <div id="modalContent">
-                <div class="upload-area" id="modalUploadArea">
-                    <div class="upload-icon">📁</div>
-                    <h3>Drag & Drop Your PDF Files Here</h3>
-                    <p>or</p>
-                    <button class="btn btn-primary" id="modalBrowseFiles">Browse Files</button>
-                    <input type="file" id="modalFileInput" accept=".pdf" style="display: none;" multiple>
-                </div>
-                <div id="fileList"></div>
-                <div class="progress-container" id="progressContainer" style="display: none;">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-                <button class="btn btn-primary" id="processBtn" style="display: none; margin-top: 20px;">Process Files</button>
-                <div id="resultContainer" style="display: none; margin-top: 20px;"></div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Auth Modal -->
-    <div class="modal" id="authModal">
-        <div class="auth-modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="auth-tabs">
-                <div class="auth-tab active" data-tab="login">Login</div>
-                <div class="auth-tab" data-tab="register">Register</div>
-            </div>
-            
-            <div class="auth-form active" id="loginForm">
-                <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" required>
-                </div>
-                <button class="btn btn-primary" id="loginBtn">Login</button>
-            </div>
-            
-            <div class="auth-form" id="registerForm">
-                <div class="form-group">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Password</label>
-                    <input type="password" id="registerPassword" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" required>
-                </div>
-                <button class="btn btn-primary" id="registerBtn">Register</button>
-            </div>
-        </div>
-    </div>
     
     <footer>
         <div class="container">
@@ -561,429 +339,171 @@
             </div>
         </div>
     </footer>
-
     <script>
-        // Authentication and User Management (optional)
-        document.addEventListener('DOMContentLoaded', function() {
-            // DOM Elements
-            const authBtn = document.getElementById('authBtn');
-            const authModal = document.getElementById('authModal');
-            const toolModal = document.getElementById('toolModal');
-            const closeModals = document.querySelectorAll('.close-modal');
-            const authTabs = document.querySelectorAll('.auth-tab');
-            const authForms = document.querySelectorAll('.auth-form');
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const loginBtn = document.getElementById('loginBtn');
-            const registerBtn = document.getElementById('registerBtn');
-            const userDropdown = document.getElementById('userDropdown');
-            const userEmail = document.getElementById('userEmail');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const myFilesBtn = document.getElementById('myFilesBtn');
-            
-            // Check if user is already logged in
-            const token = localStorage.getItem('token');
-            if (token) {
-                updateAuthUI(true);
-            }
-            
-            // Auth button click handler
-            authBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                authModal.style.display = 'flex';
-            });
-            
-            // Close modal handlers
-            closeModals.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    authModal.style.display = 'none';
-                    toolModal.style.display = 'none';
-                });
-            });
-            
-            // Click outside modal to close
-            window.addEventListener('click', function(e) {
-                if (e.target === authModal) {
-                    authModal.style.display = 'none';
-                }
-                if (e.target === toolModal) {
-                    toolModal.style.display = 'none';
-                }
-            });
-            
-            // Auth tab switching
-            authTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Update active tab
-                    authTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Show corresponding form
-                    const tabName = this.getAttribute('data-tab');
-                    authForms.forEach(form => form.classList.remove('active'));
-                    document.getElementById(`${tabName}Form`).classList.add('active');
-                });
-            });
-            
-            // Login handler (simplified for demo)
-            loginBtn.addEventListener('click', async function() {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                
-                // Simple validation
-                if (!email || !password) {
-                    alert('Please enter both email and password');
-                    return;
-                }
-                
-                // For demo purposes, just store the email
-                localStorage.setItem('token', 'demo-token');
-                localStorage.setItem('userEmail', email);
-                updateAuthUI(true, email);
-                authModal.style.display = 'none';
-                alert('Login successful! (Demo mode)');
-            });
-            
-            // Register handler (simplified for demo)
-            registerBtn.addEventListener('click', async function() {
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-                
-                if (password !== confirmPassword) {
-                    alert('Passwords do not match');
-                    return;
-                }
-                
-                // For demo purposes, just store the email
-                localStorage.setItem('token', 'demo-token');
-                localStorage.setItem('userEmail', email);
-                updateAuthUI(true, email);
-                authModal.style.display = 'none';
-                alert('Registration successful! (Demo mode)');
-            });
-            
-            // Logout handler
-            logoutBtn.addEventListener('click', function() {
-                localStorage.removeItem('token');
-                localStorage.removeItem('userEmail');
-                updateAuthUI(false);
-                alert('Logged out successfully');
-            });
-            
-            // Update UI based on auth state
-            function updateAuthUI(isLoggedIn, email = '') {
-                if (isLoggedIn) {
-                    authBtn.style.display = 'none';
-                    userDropdown.style.display = 'block';
-                    userEmail.textContent = localStorage.getItem('userEmail') || email;
-                } else {
-                    authBtn.style.display = 'block';
-                    userDropdown.style.display = 'none';
-                }
-            }
-        });
-        
-        // PDF Tools Functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // DOM Elements
-            const toolCards = document.querySelectorAll('.tool-card');
-            const uploadArea = document.getElementById('uploadArea');
-            const browseFilesBtn = document.getElementById('browseFiles');
-            const fileInput = document.getElementById('fileInput');
-            const toolModal = document.getElementById('toolModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalUploadArea = document.getElementById('modalUploadArea');
-            const modalBrowseFiles = document.getElementById('modalBrowseFiles');
-            const modalFileInput = document.getElementById('modalFileInput');
-            const fileList = document.getElementById('fileList');
-            const processBtn = document.getElementById('processBtn');
-            const progressContainer = document.getElementById('progressContainer');
-            const progressBar = document.getElementById('progressBar');
-            const resultContainer = document.getElementById('resultContainer');
-            
-            let currentTool = '';
-            let selectedFiles = [];
-            
-            // Tool Card Click Handlers
-            toolCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    currentTool = this.getAttribute('data-tool');
-                    openToolModal(currentTool);
-                });
-            });
-            
-            // Open Tool Modal
-            function openToolModal(tool) {
-                const toolTitles = {
-                    'merge': 'Merge PDF Files',
-                    'split': 'Split PDF File',
-                    'compress': 'Compress PDF File',
-                    'word': 'Convert PDF to Word',
-                    'excel': 'Convert PDF to Excel',
-                    'convert': 'Convert PDF File'
-                };
-                
-                modalTitle.textContent = toolTitles[tool] || 'PDF Tool';
-                toolModal.style.display = 'flex';
-                
-                // Reset modal content
-                fileList.innerHTML = '';
-                selectedFiles = [];
-                processBtn.style.display = 'none';
-                progressContainer.style.display = 'none';
-                resultContainer.style.display = 'none';
-                resultContainer.innerHTML = '';
-                
-                // Reset process button
-                processBtn.textContent = 'Process Files';
-                processBtn.disabled = false;
-                processBtn.onclick = processFiles;
-            }
-            
-            // File Upload Handling
-            function setupFileUpload(uploadArea, fileInput, callback) {
-                // Prevent default drag behaviors
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                    uploadArea.addEventListener(eventName, preventDefaults, false);
-                });
-                
-                function preventDefaults(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                
-                // Highlight drop area when item is dragged over it
-                ['dragenter', 'dragover'].forEach(eventName => {
-                    uploadArea.addEventListener(eventName, highlight, false);
-                });
-                
-                ['dragleave', 'drop'].forEach(eventName => {
-                    uploadArea.addEventListener(eventName, unhighlight, false);
-                });
-                
-                function highlight() {
-                    uploadArea.style.borderColor = 'var(--primary)';
-                    uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.1)';
-                }
-                
-                function unhighlight() {
-                    uploadArea.style.borderColor = '#dee2e6';
-                    uploadArea.style.backgroundColor = 'white';
-                }
-                
-                // Handle dropped files
-                uploadArea.addEventListener('drop', handleDrop, false);
-                
-                function handleDrop(e) {
-                    const dt = e.dataTransfer;
-                    const files = dt.files;
-                    callback(files);
-                }
-                
-                // Handle file input
-                fileInput.addEventListener('change', function() {
-                    callback(this.files);
-                });
-            }
-            
-            // Main upload area
-            setupFileUpload(uploadArea, fileInput, function(files) {
-                if (files.length > 0) {
-                    openToolModal('merge');
-                    handleFiles(files);
-                }
-            });
-            
-            // Modal upload area
-            setupFileUpload(modalUploadArea, modalFileInput, function(files) {
-                if (files.length > 0) {
-                    handleFiles(files);
-                }
-            });
-            
-            // Browse files buttons
-            browseFilesBtn.addEventListener('click', function() {
-                fileInput.click();
-            });
-            
-            modalBrowseFiles.addEventListener('click', function() {
-                modalFileInput.click();
-            });
-            
-            // Handle selected files
-            function handleFiles(files) {
-                const newFiles = Array.from(files).filter(file => 
-                    file.type === 'application/pdf' || file.name.endsWith('.pdf')
-                );
-                
-                if (newFiles.length === 0) {
-                    alert('Please select PDF files only.');
-                    return;
-                }
-                
-                selectedFiles = [...selectedFiles, ...newFiles];
-                displayFileList();
-                
-                if (selectedFiles.length > 0) {
-                    processBtn.style.display = 'block';
-                }
-            }
-            
-            // Display list of selected files
-            function displayFileList() {
-                fileList.innerHTML = '<h3>Selected Files:</h3>';
-                
-                if (selectedFiles.length === 0) {
-                    fileList.innerHTML += '<p>No files selected</p>';
-                    return;
-                }
-                
-                const list = document.createElement('ul');
-                list.style.listStyleType = 'none';
-                list.style.padding = '0';
-                
-                selectedFiles.forEach((file, index) => {
-                    const item = document.createElement('li');
-                    item.style.display = 'flex';
-                    item.style.justifyContent = 'space-between';
-                    item.style.alignItems = 'center';
-                    item.style.marginBottom = '10px';
-                    item.style.padding = '10px';
-                    item.style.backgroundColor = '#f8f9fa';
-                    item.style.borderRadius = '5px';
-                    
-                    const fileInfo = document.createElement('div');
-                    fileInfo.textContent = `${file.name} (${formatFileSize(file.size)})`;
-                    
-                    const removeBtn = document.createElement('button');
-                    removeBtn.textContent = 'Remove';
-                    removeBtn.classList.add('btn');
-                    removeBtn.style.backgroundColor = 'var(--danger)';
-                    removeBtn.style.borderColor = 'var(--danger)';
-                    
-                    removeBtn.addEventListener('click', function() {
-                        selectedFiles.splice(index, 1);
-                        displayFileList();
-                        
-                        if (selectedFiles.length === 0) {
-                            processBtn.style.display = 'none';
-                        }
-                    });
-                    
-                    item.appendChild(fileInfo);
-                    item.appendChild(removeBtn);
-                    list.appendChild(item);
-                });
-                
-                fileList.appendChild(list);
-            }
-            
-            // Format file size
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-            
-            // Process files (client-side simulation)
-            async function processFiles() {
-                if (selectedFiles.length === 0) return;
-                
-                // Validate files based on tool
-                if (currentTool === 'merge' && selectedFiles.length < 2) {
-                    alert('Please select at least 2 files to merge');
-                    return;
-                }
-                
-                // Disable button during processing
-                processBtn.disabled = true;
-                processBtn.textContent = 'Processing...';
-                progressContainer.style.display = 'block';
-                
-                try {
-                    // Show processing status
-                    resultContainer.style.display = 'block';
-                    resultContainer.innerHTML = `
-                        <div class="processing-status">
-                            <h3>Processing your files...</h3>
-                            <p>Please wait while we prepare your download.</p>
-                        </div>
-                    `;
-                    
-                    // Simulate progress
-                    let progress = 0;
-                    const progressInterval = setInterval(() => {
-                        progress += 5;
-                        progressBar.style.width = `${progress}%`;
-                        
-                        if (progress >= 100) {
-                            clearInterval(progressInterval);
-                            simulateFileProcessing();
-                        }
-                    }, 100);
-                    
-                } catch (err) {
-                    console.error('Processing error:', err);
-                    resultContainer.innerHTML = `
-                        <div class="error-message">
-                            <h3>Error Processing Files</h3>
-                            <p>${err.message || 'An unknown error occurred'}</p>
-                        </div>
-                    `;
-                    processBtn.disabled = false;
-                    processBtn.textContent = 'Process Files';
-                }
-            }
-            
-            // Simulate file processing and download
-            function simulateFileProcessing() {
-                // Create a dummy blob for download
-                const blob = new Blob(['This is a simulated PDF file download. In a real application, this would be your processed file.'], { type: 'application/pdf' });
-                const downloadUrl = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = downloadUrl;
-                
-                // Set appropriate filename based on tool
-                let filename = 'document';
-                switch(currentTool) {
-                    case 'merge': filename = 'merged.pdf'; break;
-                    case 'split': filename = 'split_pages.zip'; break;
-                    case 'compress': filename = 'compressed.pdf'; break;
-                    case 'word': filename = 'converted.docx'; break;
-                    case 'excel': filename = 'converted.xlsx'; break;
-                    default: filename = 'converted.pdf';
-                }
-                
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(downloadUrl);
-                
-                // Show success message
-                resultContainer.innerHTML = `
-                    <div class="download-complete">
-                        <h3>Processing Complete!</h3>
-                        <p>Your file has been processed successfully.</p>
-                        <p>If the download didn't start automatically, <a href="#" id="manualDownload">click here</a> to download.</p>
-                    </div>
-                `;
-                
-                // Handle manual download
-                document.getElementById('manualDownload')?.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    a.click();
-                });
-                
-                processBtn.disabled = false;
-                processBtn.textContent = 'Process Files';
-            }
-        });
-    </script>
+document.addEventListener('DOMContentLoaded', function() {
+  // File upload handling
+  const uploadArea = document.querySelector('.upload-area');
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.multiple = true;
+  fileInput.accept = '.pdf';
+  fileInput.style.display = 'none';
+  
+  // Add click handler to upload area
+  uploadArea.addEventListener('click', () => fileInput.click());
+  
+  // Handle file selection
+  fileInput.addEventListener('change', handleFiles);
+  
+  // Drag and drop functionality
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, preventDefaults, false);
+  });
+  
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  ['dragenter', 'dragover'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, highlight, false);
+  });
+  
+  ['dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, unhighlight, false);
+  });
+  
+  function highlight() {
+    uploadArea.classList.add('highlight');
+  }
+  
+  function unhighlight() {
+    uploadArea.classList.remove('highlight');
+  }
+  
+  uploadArea.addEventListener('drop', handleDrop, false);
+  
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFiles({ target: { files } });
+  }
+  
+  async function handleFiles(e) {
+    const files = e.target.files;
+    if (!files.length) return;
+    
+    // Show loading state
+    uploadArea.innerHTML = '<div class="spinner"></div><p>Processing files...</p>';
+    
+    try {
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].type !== 'application/pdf') {
+          throw new Error('Only PDF files are allowed');
+        }
+        if (files[i].size > 10 * 1024 * 1024) {
+          throw new Error('File size should be less than 10MB');
+        }
+        formData.append('files', files[i]);
+      }
+      
+      // Determine endpoint based on tool selection
+      const endpoint = document.querySelector('.tool-card.active')?.textContent.includes('Merge') 
+        ? '/api/merge' 
+        : '/api/split';
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to process files');
+      }
+      
+      // Get filename from Content-Disposition header or generate one
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = 'download.pdf';
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename=(.+)/i);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      // Create download link
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      a.remove();
+      
+      // Reset upload area
+      uploadArea.innerHTML = `
+        <div class="upload-icon">📁</div>
+        <h3>Drag & Drop Your PDF Files Here</h3>
+        <p>or</p>
+        <a href="#" class="btn btn-primary">Browse Files</a>
+      `;
+      
+    } catch (error) {
+      console.error('Error:', error);
+      uploadArea.innerHTML = `
+        <div class="upload-icon">❌</div>
+        <h3>Error: ${error.message}</h3>
+        <p>Please try again</p>
+        <a href="#" class="btn btn-primary">Browse Files</a>
+      `;
+    }
+  }
+  
+  // Tool selection
+  document.querySelectorAll('.tool-card').forEach(card => {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Update upload area text based on selected tool
+      const toolName = this.querySelector('h3').textContent;
+      uploadArea.querySelector('h3').textContent = `Upload PDFs to ${toolName}`;
+    });
+  });
+});
+</script>
+
+<style>
+.highlight {
+  border-color: #4361ee !important;
+  background-color: #f0f4ff;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #4361ee;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.tool-card.active {
+  border: 2px solid #4361ee;
+  background-color: #f0f4ff;
+}
+</style>
 </body>
 </html>
