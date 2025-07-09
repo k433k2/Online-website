@@ -537,46 +537,40 @@
             }
 
             // Compress PDF
-            compressBtn.addEventListener('click', async function() {
-                if (!compressFile) {
-                    showToast('Please select a PDF file to compress');
-                    return;
-                }
-                
-                compressSpinner.style.display = 'block';
-                compressBtn.disabled = true;
-                
-                try {
-                    const arrayBuffer = await compressFile.arrayBuffer();
-                    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-                    
-                    // For demonstration, we're just saving the PDF as is
-                    // In a real implementation, you would apply compression here
-                    // This might involve using a PDF compression library or service
-                    
-                    const quality = parseInt(outputQuality.value) / 100;
-                    const compressionLevelValue = parseInt(compressionLevel.value);
-                    
-                    // Note: PDF-lib doesn't support compression directly
-                    // This is just a placeholder for the actual compression logic
-                    const pdfBytes = await pdfDoc.save({
-                        useObjectStreams: true,
-                        // These options don't actually affect quality in PDF-lib
-                        // but represent where compression settings would go
-                    });
-                    
-                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                    saveAs(blob, `compressed_${compressFile.name}`);
-                    
-                    showToast('PDF compressed successfully!');
-                } catch (error) {
-                    console.error('Error compressing PDF:', error);
-                    showToast('Error compressing PDF. Please try again.');
-                } finally {
-                    compressSpinner.style.display = 'none';
-                    compressBtn.disabled = false;
-                }
-            });
+// Replace the existing compressBtn click handler with this:
+compressBtn.addEventListener('click', async function() {
+    if (!compressFile) {
+        showToast('Please select a PDF file to compress');
+        return;
+    }
+    
+    compressSpinner.style.display = 'block';
+    compressBtn.disabled = true;
+    
+    try {
+        // Get quality setting from slider (convert from 50-100 range to 0.5-1.0)
+        const quality = parseInt(document.getElementById('output-quality').value) / 100;
+        
+        // Perform the compression
+        const pdfBytes = await compressPDFWithPDFJS(compressFile, quality);
+        
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        saveAs(blob, `compressed_${compressFile.name}`);
+        
+        // Show compression results
+        const originalSize = compressFile.size;
+        const compressedSize = blob.size;
+        const reduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(2);
+        
+        showToast(`PDF compressed successfully! Reduced by ${reduction}% (${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)})`);
+    } catch (error) {
+        console.error('Error compressing PDF:', error);
+        showToast('Error compressing PDF. Please try again.');
+    } finally {
+        compressSpinner.style.display = 'none';
+        compressBtn.disabled = false;
+    }
+});
             
             // Reset compress tool
             compressReset.addEventListener('click', function() {
