@@ -407,6 +407,50 @@
         .feature-card p {
             color: var(--text-light);
         }
+       /* Add to your existing CSS */
+#compression-level {
+    width: 100%;
+    margin: 10px 0;
+    -webkit-appearance: none;
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+    outline: none;
+}
+
+#compression-level::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#output-quality {
+    width: 100%;
+    margin: 10px 0;
+    -webkit-appearance: none;
+    height: 8px;
+    background: #ddd;
+    border-radius: 4px;
+    outline: none;
+}
+
+#output-quality::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.range-value {
+    font-weight: bold;
+    margin: 5px 0;
+    color: var(--primary-color);
+}
 
         footer {
             background-color: var(--dark-color);
